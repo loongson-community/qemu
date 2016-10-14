@@ -4322,7 +4322,7 @@ int main(int argc, char **argv, char **envp)
 #endif
 #elif defined(TARGET_MIPS)
 #if defined(TARGET_ABI_MIPSN32) || defined(TARGET_ABI_MIPSN64)
-        cpu_model = "5KEf";
+        cpu_model = "Loongson-3A";
 #else
         cpu_model = "24Kf";
 #endif
