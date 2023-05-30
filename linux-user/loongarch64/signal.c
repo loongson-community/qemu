@@ -12,6 +12,7 @@
 #include "linux-user/trace.h"
 
 #include "target/loongarch/internals.h"
+#include "target/loongarch/vec.h"
 
 #ifdef TARGET_LOONGARCH64_OABI
 #define FPU_REG_WIDTH 256
