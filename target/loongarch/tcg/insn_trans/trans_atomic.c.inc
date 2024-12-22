@@ -22,13 +22,12 @@ static bool gen_sc(DisasContext *ctx, arg_rr_i *a, MemOp mop)
     TCGv dest = gpr_dst(ctx, a->rd, EXT_NONE);
     TCGv src1 = gpr_src(ctx, a->rj, EXT_NONE);
     TCGv src2 = gpr_src(ctx, a->rd, EXT_NONE);
-    TCGv t0 = tcg_temp_new();
+    TCGv t0 = make_address_i(ctx, src1, a->imm);
     TCGv val = tcg_temp_new();
 
     TCGLabel *l1 = gen_new_label();
     TCGLabel *done = gen_new_label();
 
-    tcg_gen_addi_tl(t0, src1, a->imm);
     tcg_gen_brcond_tl(TCG_COND_EQ, t0, cpu_lladdr, l1);
     tcg_gen_movi_tl(dest, 0);
     tcg_gen_br(done);
@@ -36,6 +35,7 @@ static bool gen_sc(DisasContext *ctx, arg_rr_i *a, MemOp mop)
     gen_set_label(l1);
     tcg_gen_mov_tl(val, src2);
     /* generate cmpxchg */
+    t0 = tcg_temp_new();
     tcg_gen_atomic_cmpxchg_tl(t0, cpu_lladdr, cpu_llval,
                               val, ctx->mem_idx, mop);
     tcg_gen_setcond_tl(TCG_COND_EQ, dest, t0, cpu_llval);
