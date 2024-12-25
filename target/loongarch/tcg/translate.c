@@ -288,9 +288,8 @@ static void loongarch_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
     ctx->opcode = translator_ldl(cpu_env(cs), &ctx->base, ctx->base.pc_next);
 
     if (!decode(ctx, ctx->opcode)) {
-        qemu_log_mask(LOG_UNIMP, "Error: unknown opcode. "
-                      "0x%" VADDR_PRIx ": 0x%x\n",
-                      ctx->base.pc_next, ctx->opcode);
+        qemu_log_mask(LOG_UNIMP, "Error: unknown opcode. %016"VADDR_PRIx
+                      ": 0x%08"PRIx32"\n", ctx->base.pc_next, ctx->opcode);
         generate_exception(ctx, EXCCODE_INE);
     }
 

@@ -548,7 +548,7 @@ target_ulong helper_lddir(CPULoongArchState *env, target_ulong base,
 
     if (unlikely((level == 0) || (level > 4))) {
         qemu_log_mask(LOG_GUEST_ERROR,
-                      "Attepted LDDIR with level %"PRId64"\n", level);
+                      "Attepted LDDIR with level "TARGET_FMT_ld"\n", level);
         return base;
     }
 
