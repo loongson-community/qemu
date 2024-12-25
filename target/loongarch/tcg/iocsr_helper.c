@@ -17,20 +17,20 @@
 
 uint64_t helper_iocsrrd_b(CPULoongArchState *env, target_ulong r_addr)
 {
-    return address_space_ldub(env->address_space_iocsr, r_addr,
-                              GET_MEMTXATTRS(env), NULL);
+    return (int8_t)address_space_ldub(env->address_space_iocsr, r_addr,
+                                      GET_MEMTXATTRS(env), NULL);
 }
 
 uint64_t helper_iocsrrd_h(CPULoongArchState *env, target_ulong r_addr)
 {
-    return address_space_lduw(env->address_space_iocsr, r_addr,
-                              GET_MEMTXATTRS(env), NULL);
+    return (int16_t)address_space_lduw(env->address_space_iocsr, r_addr,
+                                       GET_MEMTXATTRS(env), NULL);
 }
 
 uint64_t helper_iocsrrd_w(CPULoongArchState *env, target_ulong r_addr)
 {
-    return address_space_ldl(env->address_space_iocsr, r_addr,
-                             GET_MEMTXATTRS(env), NULL);
+    return (int32_t)address_space_ldl(env->address_space_iocsr, r_addr,
+                                      GET_MEMTXATTRS(env), NULL);
 }
 
 uint64_t helper_iocsrrd_d(CPULoongArchState *env, target_ulong r_addr)
