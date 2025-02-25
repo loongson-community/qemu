@@ -128,5 +128,7 @@ void target_cpu_copy_regs(CPUArchState *env, target_pt_regs *regs)
         env->gpr[i] = regs->regs[i];
     }
     env->pc = regs->csr.era;
-
+#ifdef TARGET_ABI32
+    env->CSR_MISC |= 0xe;
+#endif
 }

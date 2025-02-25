@@ -1253,20 +1253,24 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUPPCState *en
 
 #endif
 
-#ifdef TARGET_LOONGARCH64
+#ifdef TARGET_LOONGARCH
 
-#define ELF_CLASS   ELFCLASS64
 #define ELF_ARCH    EM_LOONGARCH
 #define EXSTACK_DEFAULT true
 
 #define elf_check_arch(x) ((x) == EM_LOONGARCH)
 
-#define VDSO_HEADER "vdso.c.inc"
+#ifdef TARGET_ABI32
+#define ELF_CLASS   ELFCLASS32
+#else
+#define ELF_CLASS   ELFCLASS64
+#define VDSO_HEADER "vdso-64.c.inc"
+#endif
 
 static inline void init_thread(struct target_pt_regs *regs,
                                struct image_info *infop)
 {
-    /*Set crmd PG,DA = 1,0 */
+    /* Set crmd PG, DA = 1,0 */
     regs->csr.crmd = 2 << 3;
     regs->csr.era = infop->entry;
     regs->regs[3] = infop->start_stack;

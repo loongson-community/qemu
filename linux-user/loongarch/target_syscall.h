@@ -31,8 +31,13 @@ struct target_pt_regs {
     target_ulong __last[0];
 };
 
+#ifdef TARGET_ABI32
+#define UNAME_MACHINE "loongarch32"
+#define UNAME_MINIMUM_RELEASE "5.19.0"
+#else
 #define UNAME_MACHINE "loongarch64"
 #define UNAME_MINIMUM_RELEASE "5.19.0"
+#endif
 
 #define TARGET_MCL_CURRENT 1
 #define TARGET_MCL_FUTURE  2
