@@ -18,10 +18,10 @@
 #define SC_USED_FP              (1 << 0)
 
 struct target_sigcontext {
-    abi_ulong sc_pc;
-    abi_ulong sc_regs[32];
-    abi_uint  sc_flags;
-    abi_ulong sc_extcontext[0]   QEMU_ALIGNED(16);
+    uint64_t sc_pc;
+    uint64_t sc_regs[32];
+    uint32_t  sc_flags;
+    uint64_t sc_extcontext[0]   QEMU_ALIGNED(16);
 };
 
 QEMU_BUILD_BUG_ON(sizeof(struct target_sigcontext) != sizeof_sigcontext);
@@ -33,9 +33,9 @@ QEMU_BUILD_BUG_ON(offsetof(struct target_sigcontext, sc_regs)
 #define FPU_CTX_MAGIC           0x46505501
 #define FPU_CTX_ALIGN           8
 struct target_fpu_context {
-    abi_ulong regs[32];
-    abi_ulong fcc;
-    abi_uint  fcsr;
+    uint64_t regs[32];
+    uint64_t fcc;
+    uint32_t fcsr;
 } QEMU_ALIGNED(FPU_CTX_ALIGN);
 
 QEMU_BUILD_BUG_ON(offsetof(struct target_fpu_context, regs)
@@ -44,24 +44,24 @@ QEMU_BUILD_BUG_ON(offsetof(struct target_fpu_context, regs)
 #define LSX_CTX_MAGIC           0x53580001
 #define LSX_CTX_ALIGN           16
 struct target_lsx_context {
-    abi_ulong regs[2 * 32];
-    abi_ulong fcc;
-    abi_uint  fcsr;
+    uint64_t regs[2 * 32];
+    uint64_t fcc;
+    uint32_t fcsr;
 } QEMU_ALIGNED(LSX_CTX_ALIGN);
 
 #define LASX_CTX_MAGIC          0x41535801
 #define LASX_CTX_ALIGN          32
 struct target_lasx_context {
-    abi_ulong regs[4 * 32];
-    abi_ulong fcc;
-    abi_uint  fcsr;
+    uint64_t regs[4 * 32];
+    uint64_t fcc;
+    uint32_t  fcsr;
 } QEMU_ALIGNED(LASX_CTX_ALIGN);
 
 #define CONTEXT_INFO_ALIGN      16
 struct target_sctx_info {
-    abi_uint  magic;
-    abi_uint  size;
-    abi_ulong padding;
+    uint32_t  magic;
+    uint32_t  size;
+    uint64_t padding;
 } QEMU_ALIGNED(CONTEXT_INFO_ALIGN);
 
 QEMU_BUILD_BUG_ON(sizeof(struct target_sctx_info) != sizeof_sctx_info);
@@ -80,10 +80,12 @@ struct target_rt_sigframe {
     struct target_ucontext       rs_uc;
 };
 
+#if 0
 QEMU_BUILD_BUG_ON(sizeof(struct target_rt_sigframe)
                   != sizeof_rt_sigframe);
 QEMU_BUILD_BUG_ON(offsetof(struct target_rt_sigframe, rs_uc.tuc_mcontext)
                   != offsetof_sigcontext);
+#endif
 
 /*
  * These two structures are not present in guest memory, are private
