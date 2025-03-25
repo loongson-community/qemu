@@ -1270,10 +1270,10 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUPPCState *en
 static inline void init_thread(struct target_pt_regs *regs,
                                struct image_info *infop)
 {
-    /* Set crmd PG, DA = 1,0 */
-    regs->csr.crmd = 2 << 3;
+    /* Set crmd PG, DA = 1,0 PLV=3 */
+    regs->csr.crmd = 2 << 3 | 3 ;
     regs->csr.era = infop->entry;
-    regs->regs[3] = infop->start_stack;
+    regs->regs[3] = (abi_long)infop->start_stack;
 }
 
 /* See linux kernel: arch/loongarch/include/asm/elf.h */

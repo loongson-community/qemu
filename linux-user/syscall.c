@@ -3003,8 +3003,8 @@ static void target_to_host_low_high(abi_ulong tlow,
                                     unsigned long *hhigh)
 {
     uint64_t off = tlow |
-        ((unsigned long long)thigh << TARGET_LONG_BITS / 2) <<
-        TARGET_LONG_BITS / 2;
+        ((unsigned long long)thigh << sizeof(abi_ulong) * 2) <<
+        sizeof(abi_ulong) * 2;
 
     *hlow = off;
     *hhigh = (off >> HOST_LONG_BITS / 2) >> HOST_LONG_BITS / 2;
