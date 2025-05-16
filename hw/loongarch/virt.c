@@ -511,8 +511,11 @@ static MemTxResult virt_iocsr_misc_write(void *opaque, hwaddr addr,
 {
     LoongArchVirtMachineState *lvms = LOONGARCH_VIRT_MACHINE(opaque);
     uint64_t features;
+    int write_shift = addr & 0x7;
+    uint64_t wmask = MAKE_64BIT_MASK(write_shift * 8, size * 8);
+    val = (val << write_shift) & wmask;
 
-    switch (addr) {
+    switch (addr & ~0x7ULL) {
     case MISC_FUNC_REG:
         if (!virt_is_veiointc_enabled(lvms)) {
             return MEMTX_OK;
@@ -533,7 +536,7 @@ static MemTxResult virt_iocsr_misc_write(void *opaque, hwaddr addr,
                           features, attrs, NULL);
         break;
     default:
-        g_assert_not_reached();
+        break;
     }
 
     return MEMTX_OK;
@@ -546,8 +549,9 @@ static MemTxResult virt_iocsr_misc_read(void *opaque, hwaddr addr,
     LoongArchVirtMachineState *lvms = LOONGARCH_VIRT_MACHINE(opaque);
     uint64_t ret = 0;
     int features;
+    int read_shift = addr & 0x7;
 
-    switch (addr) {
+    switch (addr & ~0x7ULL) {
     case VERSION_REG:
         ret = 0x11ULL;
         break;
@@ -580,10 +584,12 @@ static MemTxResult virt_iocsr_misc_read(void *opaque, hwaddr addr,
         }
         break;
     default:
-        g_assert_not_reached();
+        ret = 0;
+        break;
     }
 
-    *data = ret;
+    *data = ret >> read_shift & MAKE_64BIT_MASK(0, size * 8);
+
     return MEMTX_OK;
 }
 
@@ -592,11 +598,7 @@ static const MemoryRegionOps virt_iocsr_misc_ops = {
     .write_with_attrs = virt_iocsr_misc_write,
     .endianness = DEVICE_LITTLE_ENDIAN,
     .valid = {
-        .min_access_size = 4,
-        .max_access_size = 8,
-    },
-    .impl = {
-        .min_access_size = 8,
+        .min_access_size = 1,
         .max_access_size = 8,
     },
 };
