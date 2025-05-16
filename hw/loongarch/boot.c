@@ -277,10 +277,17 @@ static void init_cmdline(struct loongarch_boot_info *info, void *p, void *start)
 
 static uint64_t cpu_loongarch_virt_to_phys(void *opaque, uint64_t addr)
 {
-    return addr & MAKE_64BIT_MASK(0, TARGET_PHYS_ADDR_SPACE_BITS);
+    LoongArchCPU *lacpu = opaque;
+
+    if (is_la64(&lacpu->env)) {
+        return addr & MAKE_64BIT_MASK(0, 48);
+    }
+
+    return addr & MAKE_64BIT_MASK(0, 28);
 }
 
 static int64_t load_loongarch_linux_image(const char *filename,
+                                          LoongArchCPU *lacpu,
                                           uint64_t *kernel_entry,
                                           uint64_t *kernel_low,
                                           uint64_t *kernel_high)
@@ -311,10 +318,10 @@ static int64_t load_loongarch_linux_image(const char *filename,
     }
 
     /* Early kernel versions may have those fields in virtual address */
-    *kernel_entry = extract64(le64_to_cpu(hdr->kernel_entry),
-                              0, TARGET_PHYS_ADDR_SPACE_BITS);
-    *kernel_low = extract64(le64_to_cpu(hdr->load_offset),
-                            0, TARGET_PHYS_ADDR_SPACE_BITS);
+    *kernel_entry = cpu_loongarch_virt_to_phys(lacpu,
+                            le64_to_cpu(hdr->kernel_entry));
+    *kernel_low = cpu_loongarch_virt_to_phys(lacpu,
+                            le64_to_cpu(hdr->load_offset));
     *kernel_high = *kernel_low + size;
 
     rom_add_blob_fixed(filename, buffer, size, *kernel_low);
@@ -324,18 +331,19 @@ static int64_t load_loongarch_linux_image(const char *filename,
     return size;
 }
 
-static int64_t load_kernel_info(struct loongarch_boot_info *info)
+static int64_t load_kernel_info(struct loongarch_boot_info *info,
+                                LoongArchCPU *lacpu)
 {
     uint64_t kernel_entry, kernel_low, kernel_high;
     ssize_t kernel_size;
 
     kernel_size = load_elf(info->kernel_filename, NULL,
-                           cpu_loongarch_virt_to_phys, NULL,
+                           cpu_loongarch_virt_to_phys, lacpu,
                            &kernel_entry, &kernel_low,
                            &kernel_high, NULL, ELFDATA2LSB,
                            EM_LOONGARCH, 1, 0);
     if (kernel_size < 0) {
-        kernel_size = load_loongarch_linux_image(info->kernel_filename,
+        kernel_size = load_loongarch_linux_image(info->kernel_filename, lacpu,
                                                  &kernel_entry, &kernel_low,
                                                  &kernel_high);
     }
@@ -346,6 +354,8 @@ static int64_t load_kernel_info(struct loongarch_boot_info *info)
                      load_elf_strerror(kernel_size));
         exit(1);
     }
+
+    kernel_entry = cpu_loongarch_virt_to_phys(lacpu, kernel_entry);
 
     if (info->initrd_filename) {
         initrd_size = get_image_size(info->initrd_filename);
@@ -445,7 +455,7 @@ static void loongarch_direct_kernel_boot(struct loongarch_boot_info *info)
     CPUState *cs;
 
     if (info->kernel_filename) {
-        kernel_addr = load_kernel_info(info);
+        kernel_addr = load_kernel_info(info, lacpu);
     } else {
         if (!qtest_enabled()) {
             warn_report("No kernel provided, booting from flash drive.");
