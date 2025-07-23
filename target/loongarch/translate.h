@@ -14,11 +14,17 @@
     static bool trans_##NAME(DisasContext *ctx, arg_##NAME * a) \
     { return avail_##AVAIL(ctx) && FUNC(ctx, a, __VA_ARGS__); }
 
+#define TRANS32S(NAME, AVAIL, FUNC, ...) \
+    static bool trans_##NAME(DisasContext *ctx, arg_##NAME * a) \
+    { return avail_32S(ctx) && avail_##AVAIL(ctx) && FUNC(ctx, a, __VA_ARGS__); }
+
 #define TRANS64(NAME, AVAIL, FUNC, ...) \
     static bool trans_##NAME(DisasContext *ctx, arg_##NAME * a) \
     { return avail_64(ctx) && avail_##AVAIL(ctx) && FUNC(ctx, a, __VA_ARGS__); }
 
 #define avail_ALL(C)   true
+#define avail_32S(C)   (FIELD_EX32((C)->cpucfg1, CPUCFG1, ARCH) >= \
+                        CPUCFG1_ARCH_LA32)
 #define avail_64(C)    (FIELD_EX32((C)->cpucfg1, CPUCFG1, ARCH) == \
                         CPUCFG1_ARCH_LA64)
 #define avail_FP(C)    (FIELD_EX32((C)->cpucfg2, CPUCFG2, FP))

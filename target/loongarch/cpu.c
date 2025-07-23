@@ -429,6 +429,36 @@ static void loongarch_la132_initfn(Object *obj)
     env->cpucfg[1] = data;
 }
 
+static void loongarch_max32r_initfn(Object *obj)
+{
+    LoongArchCPU *cpu = LOONGARCH_CPU(obj);
+    CPULoongArchState *env = &cpu->env;
+    uint32_t data = 0;
+    int i;
+
+    for (i = 0; i < 21; i++) {
+        env->cpucfg[i] = 0x0;
+    }
+
+    cpu->dtb_compatible = "loongarch,la32r";
+    env->cpucfg[0] = 0x148042;  /* PRID */
+
+    data = FIELD_DP32(data, CPUCFG1, ARCH, 0); /* LA32R */
+    data = FIELD_DP32(data, CPUCFG1, PGMMU, 1);
+    data = FIELD_DP32(data, CPUCFG1, PALEN, 0x1f); /* 32 bits */
+    data = FIELD_DP32(data, CPUCFG1, VALEN, 0x1f); /* 32 bits */
+    env->cpucfg[1] = data;
+
+    data = 0;
+    data = FIELD_DP32(data, CPUCFG2, FP, 1);
+    data = FIELD_DP32(data, CPUCFG2, FP_SP, 1);
+    data = FIELD_DP32(data, CPUCFG2, FP_DP, 1);
+    data = FIELD_DP32(data, CPUCFG2, FP_VER, 1);
+    env->cpucfg[2] = data;
+
+    loongarch_cpu_post_init(obj);
+}
+
 static void loongarch_max32_initfn(Object *obj)
 {
     LoongArchCPU *cpu = LOONGARCH_CPU(obj);
@@ -1090,6 +1120,7 @@ static const TypeInfo loongarch_cpu_type_infos[] = {
         .class_init = loongarch64_cpu_class_init,
     },
     DEFINE_LOONGARCH_CPU_TYPE(32, "la132", loongarch_la132_initfn),
+    DEFINE_LOONGARCH_CPU_TYPE(32, "max32r", loongarch_max32r_initfn),
     DEFINE_LOONGARCH_CPU_TYPE(32, "max32", loongarch_max32_initfn),
     DEFINE_LOONGARCH_CPU_TYPE(64, "la464", loongarch_la464_initfn),
     DEFINE_LOONGARCH_CPU_TYPE(64, "max", loongarch_max_initfn),

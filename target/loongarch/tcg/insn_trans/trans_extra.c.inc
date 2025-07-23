@@ -81,6 +81,10 @@ static bool trans_cpucfg(DisasContext *ctx, arg_cpucfg *a)
     TCGv dest = gpr_dst(ctx, a->rd, EXT_NONE);
     TCGv src1 = gpr_src(ctx, a->rj, EXT_NONE);
 
+    if (!avail_32S(ctx)) {
+        return false;
+    }
+
     gen_helper_cpucfg(dest, tcg_env, src1);
     gen_set_gpr(a->rd, dest, EXT_NONE);
 
