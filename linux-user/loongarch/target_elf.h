@@ -8,7 +8,7 @@
 static inline const char *cpu_get_model(uint32_t eflags)
 {
 #ifdef TARGET_ABI32
-    return "max32";
+    return "la32r";
 #else
     return "la464";
 #endif
