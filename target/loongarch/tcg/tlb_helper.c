@@ -445,6 +445,9 @@ void helper_invtlb_page_asid(CPULoongArchState *env, target_ulong info,
 {
     uint16_t asid = info & 0x3ff;
 
+    if (!is_la64(env))
+        addr &= MAKE_64BIT_MASK(0, 32);
+
     for (int i = 0; i < LOONGARCH_TLB_MAX; i++) {
         LoongArchTLB *tlb = &env->tlb[i];
         uint8_t tlb_g = FIELD_EX64(tlb->tlb_entry0, TLBENTRY, G);
@@ -477,6 +480,9 @@ void helper_invtlb_page_asid_or_g(CPULoongArchState *env,
                                   target_ulong info, target_ulong addr)
 {
     uint16_t asid = info & 0x3ff;
+
+    if (!is_la64(env))
+        addr &= MAKE_64BIT_MASK(0, 32);
 
     for (int i = 0; i < LOONGARCH_TLB_MAX; i++) {
         LoongArchTLB *tlb = &env->tlb[i];

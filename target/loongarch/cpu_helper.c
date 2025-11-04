@@ -97,6 +97,9 @@ bool loongarch_tlb_search(CPULoongArchState *env, target_ulong vaddr,
     int i, compare_shift;
     uint64_t vpn, tlb_vppn;
 
+    if (!is_la64(env))
+        vaddr &= MAKE_64BIT_MASK(0, 32);
+
     csr_asid = FIELD_EX64(env->CSR_ASID, CSR_ASID, ASID);
     stlb_ps = FIELD_EX64(env->CSR_STLBPS, CSR_STLBPS, PS);
     vpn = (vaddr & TARGET_VIRT_MASK) >> (stlb_ps + 1);
