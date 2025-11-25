@@ -511,7 +511,7 @@ static MemTxResult virt_iocsr_misc_write(void *opaque, hwaddr addr,
 {
     LoongArchVirtMachineState *lvms = LOONGARCH_VIRT_MACHINE(opaque);
     uint64_t features;
-    int write_shift = addr & 0x7;
+    int write_shift = (addr & 0x7) * 8;
     uint64_t wmask = MAKE_64BIT_MASK(write_shift * 8, size * 8);
     val = (val << write_shift) & wmask;
 
@@ -549,7 +549,7 @@ static MemTxResult virt_iocsr_misc_read(void *opaque, hwaddr addr,
     LoongArchVirtMachineState *lvms = LOONGARCH_VIRT_MACHINE(opaque);
     uint64_t ret = 0;
     int features;
-    int read_shift = addr & 0x7;
+    int read_shift = (addr & 0x7) * 8;
 
     switch (addr & ~0x7ULL) {
     case VERSION_REG:
